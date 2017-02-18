@@ -3,11 +3,13 @@
 import database
 import os
 from flask import Flask, render_template, session, request, redirect, url_for
+from flask import abort
 
 SAVE_SESSION = True
 app = Flask(__name__)
 
 no_lock_pages = ["/static", "/login", "/logout"]
+admin_lock_pages = []
 
 
 @app.before_request
@@ -17,6 +19,10 @@ def lock():
             return
     if 'username' not in session:
         return redirect(url_for('login'))
+    for page in admin_lock_pages:
+        if page in request.path:
+            if session['role'] != "admin":
+                abort(403)
 
 
 @app.route('/')
@@ -30,7 +36,8 @@ def index():
 def login():
     if request.method == 'POST':
         users = database.user.select().where(
-            database.user.username == request.form['username'])
+            database.user.username == request.form['username'],
+            database.user.password == request.form['password'])
         if len(users) == 1:
             session['username'] = users[0].username
             session['role'] = users[0].role

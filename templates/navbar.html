@@ -1,5 +1,11 @@
 <nav>
+  {% if session.role == 'red1' or session.role == 'red2' %}
+  <div class="nav-wrapper red" style="padding-left: 0.75rem;">
+  {% elif session.role == 'blue1' or session.role == 'blue2' %}
   <div class="nav-wrapper blue" style="padding-left: 0.75rem;">
+  {% else %}
+  <div class="nav-wrapper orange" style="padding-left: 0.75rem;">
+  {% endif %}
     <a href="#" class="brand-logo center">Snake Sort</a>
     <ul id="nav-mobile" class="left hide-on-med-and-down">
       <li><a href="sass.html">Sass</a></li>
