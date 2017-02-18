@@ -7,17 +7,23 @@ from flask import Flask, render_template, session, request, redirect, url_for
 SAVE_SESSION = True
 app = Flask(__name__)
 
+no_lock_pages = ["/static", "/login", "/logout"]
+
 
 @app.before_request
 def lock():
-    if "/static" not in request.path and "/login" not in request.path:
-        if 'username' not in session:
-            return redirect(url_for('login'))
+    for page in no_lock_pages:
+        if page in request.path:
+            return
+    if 'username' not in session:
+        return redirect(url_for('login'))
 
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    if request.method == 'POST':
+        pass
+    return render_template('index.html', team="211Z")
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -33,9 +39,15 @@ def login():
         return redirect(url_for('index'))
     return render_template("login.html")
 
+
+@app.route("/logout")
+def logout():
+    session.pop('username', None)
+    return redirect(url_for('login'))
+
 if __name__ == '__main__':
     if SAVE_SESSION:
-        app.secret_key = os.urandom(24)
-    else:
         app.secret_key = "+8\x0fUb\x84\xbe\xc1\xe6'@\x03\xb5\x08?oT.8?_\x88"
+    else:
+        app.secret_key = os.urandom(24)
     app.run(host='0.0.0.0')

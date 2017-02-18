@@ -1,10 +1,12 @@
 <nav>
   <div class="nav-wrapper blue" style="padding-left: 0.75rem;">
-    <a href="#" class="brand-logo">Snake Sort</a>
-    <ul id="nav-mobile" class="right hide-on-med-and-down">
+    <a href="#" class="brand-logo center">Snake Sort</a>
+    <ul id="nav-mobile" class="left hide-on-med-and-down">
       <li><a href="sass.html">Sass</a></li>
       <li><a href="badges.html">Components</a></li>
-      <li><a href="collapsible.html">JavaScript</a></li>
+    </ul>
+    <ul id="nav-mobile" class="right hide-on-med-and-down">
+      <li><a href="{{ url_for('logout') }}">{{ session.username }}</a></li>
     </ul>
   </div>
 </nav>
