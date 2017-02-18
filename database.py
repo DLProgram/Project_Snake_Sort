@@ -23,5 +23,25 @@ class match(peewee.Model):
         database = db
 
 
+class user(peewee.Model):
+    """Table storing all users.
+
+    Args:
+        username(char): Username
+        password(char): Password
+        role(char): role of the user, eg. admin, red, blue
+    """
+    username = peewee.CharField()
+    password = peewee.CharField()
+    role = peewee.CharField()
+
+    class Meta:
+        database = db
+
+
 def create_tables():
     match.create_table()
+    user.create_table()
+
+if __name__ == '__main__':
+    create_tables()
