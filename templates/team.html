@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+  <html>
+    <head>
+      <!--Import materialize.css-->
+      <link type="text/css" rel="stylesheet" href="{{url_for('static',filename='materialize.min.css')}}"  media="screen,projection"/>
+      <title>Snake Sort</title>
+      <!--Let browser know website is optimized for mobile-->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </head>
+
+    <body>
+      {% include  "navbar.html" %}
+      <div class="container">
+        <div class="row">
+          <h3>Manage Teams</h3>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Auto</th>
+              <th>Speed</th>
+              <th>Capacity</th>
+              <th>Driver</th>
+
+              <th>Hang</th>
+              <th>Cube</th>
+              <th>Blocking</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for team in teams %}
+            <tr>
+              <td><a href="{{ url_for('team_picklist', team_name=team.team_name) }}">{{ team.team_name }}</a></td>
+              <td>{{ team.auto }}</td>
+              <td>{{ team.speed }}</td>
+              <td>{{ team.capacity }}</td>
+              <td>{{ team.driver }}</td>
+
+              <td>{{ team.hang }}</td>
+              <td>{{ team.cube }}</td>
+              <td>{{ team.blocking }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <div class="row">
+          <div class="col m6">
+            <h3>Add Team</h3>
+          </div>
+        </div>
+        <form method="post">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Auto</th>
+                <th>Speed</th>
+                <th>Capacity</th>
+                <th>Driver</th>
+
+                <th>Hang</th>
+                <th>Cube</th>
+                <th>Blocking</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <input type="text" name="team_name" value="211">
+                </td>
+                <td>
+                  <input type="text" name="auto" value="0">
+                </td>
+                <td>
+                  <input type="text" name="speed" value="0">
+                </td>
+                <td>
+                  <input type="text" name="capacity" value="0">
+                </td>
+                <td>
+                  <input type="text" name="driver" value="0">
+                </td>
+                <td>
+                  <input type="text" name="hang" value="0">
+                </td>
+                <td>
+                  <input type="text" name="cube" value="0">
+                </td>
+                <td>
+                  <input type="text" name="blocking" value="0">
+                </td>
+                <td>
+                  <input class="waves-effect waves-light btn" type="submit" value="Add Team">
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+      </div>
+      <!--Import jQuery before materialize.js-->
+      <script type="text/javascript" src="{{url_for('static', filename='jquery-3.1.1.min.js')}}"></script>
+      <script type="text/javascript" src="{{url_for('static', filename='materialize.min.js')}}"></script>
+    </body>
+  </html>

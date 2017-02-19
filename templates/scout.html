@@ -61,7 +61,11 @@
         </div>
         <div class="row">
           <div class="col s2">
+            {% if team == "Admin"%}
+            <input class="waves-effect waves-light btn disabled" type="submit" value="Submit" id="btnSubmit">
+            {% else %}            
             <input class="waves-effect waves-light btn" type="submit" value="Submit" id="btnSubmit">
+            {% endif %}
           </div>
         </div>
       </form>

@@ -6,11 +6,17 @@
   {% else %}
   <div class="nav-wrapper orange" style="padding-left: 0.75rem;">
   {% endif %}
+    {% if session.role == 'admin'%}
+    <a href="{{ url_for('index') }}" class="brand-logo center">Snake Sort</a>
+    {% else %}
     <a href="#" class="brand-logo center">Snake Sort</a>
+    {% endif %}
+    {% if session.role == 'admin'%}
     <ul id="nav-mobile" class="left hide-on-med-and-down">
-      <li><a href="sass.html">Sass</a></li>
-      <li><a href="badges.html">Components</a></li>
+      <li><a href="{{ url_for('get_events') }}">Get Events</a></li>
+      <li><a href="{{ url_for('manage_teams') }}">Manage Teams</a></li>
     </ul>
+    {% endif %}
     <ul id="nav-mobile" class="right hide-on-med-and-down">
       <li><a href="{{ url_for('logout') }}">{{ session.username }}</a></li>
     </ul>

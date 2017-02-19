@@ -71,6 +71,22 @@ class entry(peewee.Model):
         database = db
 
 
+class team(peewee.Model):
+    team_name = peewee.CharField()
+
+    auto = peewee.FloatField()
+    speed = peewee.FloatField()
+    capacity = peewee.FloatField()
+    driver = peewee.FloatField()
+
+    hang = peewee.FloatField()
+    cube = peewee.FloatField()
+    blocking = peewee.FloatField()
+
+    class Meta:
+        database = db
+
+
 def create_tables():
     try:
         match.create_table()
@@ -90,6 +106,6 @@ def create_tables():
     except:
         print("Table entry already exists")
 
-
+    team.create_table()
 if __name__ == '__main__':
     create_tables()

@@ -10,7 +10,9 @@ SAVE_SESSION = True
 app = Flask(__name__)
 
 no_lock_pages = ["/static", "/login", "/logout"]
-admin_lock_pages = []
+admin_lock_pages = ["/get_events", "/get_divisions",
+                    "/get_matches", "/save_match_data",
+                    "/manage_teams"]
 
 
 @app.before_request
@@ -31,7 +33,7 @@ def index():
     if "red" in session['role'] or "blue" in session['role']:
         return redirect(url_for('scout', match_num=1))
     elif "admin" in session['role']:
-        return redirect(url_for('admin'))
+        return redirect(url_for('manage_teams'))
 
 
 @app.route('/scout/<int:match_num>', methods=['GET', 'POST'])
@@ -39,7 +41,7 @@ def scout(match_num):
     if request.method == 'POST':
         if process_request(match_num):
             return redirect(url_for('scout', match_num=match_num + 1))
-    return render_template('index.html',
+    return render_template('scout.html',
                            team=get_team_num(match_num, session['role']),
                            match=match_num)
 
@@ -54,7 +56,7 @@ def get_team_num(match_num, color):
     elif color == "blue2":
         return database.match.get(database.match.match_id == match_num).blue2
     else:
-        return ""
+        return "Admin"
 
 
 def process_request(match_num):
@@ -122,6 +124,46 @@ def save_match_data(event_id, division_id):
 
     return render_template("dialog.html", type="suss", title="Success!",
                            text="Match data saved to database!")
+
+
+@app.route("/manage_teams", methods=['GET', 'POST'])
+def manage_teams():
+    if request.method == 'POST':
+        team_name = request.form["team_name"]
+
+        auto = int(request.form["auto"])
+        speed = int(request.form["speed"])
+        capacity = int(request.form["capacity"])
+        driver = int(request.form["driver"])
+
+        hang = int(request.form["hang"])
+        cube = int(request.form["cube"])
+        blocking = int(request.form["blocking"])
+        total = auto + speed + capacity + driver + hang + cube + blocking
+        database.team.create(team_name=team_name,
+                             auto=auto / total * 100,
+                             speed=speed / total * 100,
+                             capacity=capacity / total * 100,
+                             driver=driver / total * 100,
+                             hang=hang / total * 100,
+                             cube=cube / total * 100,
+                             blocking=blocking / total * 100)
+    teams = []
+    for team in database.team.select():
+        teams.append({"team_name": team.team_name,
+                      "auto": team.auto,
+                      "speed": team.speed,
+                      "capacity": team.capacity,
+                      "driver": team.driver,
+                      "hang": team.hang,
+                      "cube": team.cube,
+                      "blocking": team.blocking})
+    return render_template("team.html", teams=teams)
+
+
+@app.route("/team_picklist/<team_name>")
+def team_picklist(team_name):
+    return team_name
 
 
 @app.route("/login", methods=['GET', 'POST'])
