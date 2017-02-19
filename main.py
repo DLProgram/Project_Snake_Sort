@@ -4,6 +4,7 @@ import database
 import os
 from flask import Flask, render_template, session, request, redirect, url_for
 from flask import abort
+import vex_via_wrapper
 
 SAVE_SESSION = True
 app = Flask(__name__)
@@ -38,8 +39,6 @@ def scout(match_num):
     if request.method == 'POST':
         if process_request(match_num):
             return redirect(url_for('scout', match_num=match_num + 1))
-        else:
-            return render_template('index.html', team="211Z", match=match_num)
     return render_template('index.html', team="211Z", match=match_num)
 
 
@@ -67,6 +66,47 @@ def process_request(match_num):
         return True
     except:
         return False
+
+
+@app.route("/get_events")
+def get_events():
+    data = []
+    for e in vex_via_wrapper.get_events():
+        data.append({'id': e[0], 'name': e[1], 'location': e[2]})
+    return render_template("vex_via.html", type="event", data=data)
+
+
+@app.route("/get_divisions/<event_id>")
+def get_divisions(event_id):
+    data = []
+    for e in vex_via_wrapper.get_divisions(event_id):
+        data.append({'id': e[0], 'name': e[1], 'event_id': event_id})
+    return render_template("vex_via.html", type="division", data=data)
+
+
+@app.route("/get_matches/<event_id>/<division_id>")
+def get_matches(event_id, division_id):
+    data = []
+    for m in vex_via_wrapper.get_matches(event_id, division_id):
+        if m[0] == '2':
+            data.append({"id": m[2], "red1": m[5], "red2": m[
+                        6], "blue1": m[8], "blue2": m[9]})
+    return render_template("vex_via.html", type="match", data=data,
+                           event_id=event_id, division_id=division_id)
+
+
+@app.route("/save_match_data/<event_id>/<division_id>")
+def save_match_data(event_id, division_id):
+    for m in vex_via_wrapper.get_matches(event_id, division_id):
+        if m[0] == '2':
+            database.match.create(match_id=m[2],
+                                  red1=m[5],
+                                  red2=m[6],
+                                  blue1=m[8],
+                                  blue2=m[9])
+
+    return render_template("dialog.html", type="suss", title="Success!",
+                           text="Match data saved to database!")
 
 
 @app.route("/login", methods=['GET', 'POST'])

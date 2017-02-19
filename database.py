@@ -40,6 +40,21 @@ class user(peewee.Model):
 
 
 class entry(peewee.Model):
+    """Table storing all entries.
+
+    Args:
+        team_name(Char): Team name
+        match_num(Int): Match number
+
+        auto(Int): Auto score
+        speed(Int): Speed of the robot
+        capacity(Int): Capacity rating
+        driver(Int): Driver's skill
+
+        hang(Bool): High hang in 10s
+        cube(Bool): Cube in the far zone
+        blocking(Bool): Blocking ability
+    """
     team_name = peewee.CharField()
     match_num = peewee.IntegerField()
 
