@@ -11,10 +11,11 @@
     <body>
       {% include  "navbar.html" %}
       <div class="container">
-      <form method="get">
+      <form id="data-form" method="post">
         <div class="row">
           <div class="col s6">
-            <h1>{{ team }}</h1>
+            <h1>{{ match }} - {{ team }}</h1>
+            <h2><h2>
             <input type="hidden" name="team_name" value="{{ team }}">
           </div>
           <div class="col s6">
@@ -60,7 +61,7 @@
         </div>
         <div class="row">
           <div class="col s2">
-            <input class="waves-effect waves-light btn" type="submit" value="Submit">
+            <input class="waves-effect waves-light btn" type="submit" value="Submit" id="btnSubmit">
           </div>
         </div>
       </form>
