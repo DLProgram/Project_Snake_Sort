@@ -39,9 +39,42 @@ class user(peewee.Model):
         database = db
 
 
+class entry(peewee.Model):
+    team_name = peewee.CharField()
+    match_num = peewee.IntegerField()
+
+    auto = peewee.IntegerField()
+    speed = peewee.IntegerField()
+    capacity = peewee.IntegerField()
+    driver = peewee.IntegerField()
+
+    hang = peewee.BooleanField()
+    cube = peewee.BooleanField()
+    blocking = peewee.BooleanField()
+
+    class Meta:
+        database = db
+
+
 def create_tables():
-    match.create_table()
-    user.create_table()
+    try:
+        match.create_table()
+    except:
+        print("Table match already exists")
+    try:
+        user.create_table()
+        user.create(username="admin", password="admin", role="admin")
+        user.create(username="red1", password="red1", role="red1")
+        user.create(username="red2", password="red2", role="red2")
+        user.create(username="blue1", password="blue1", role="blue1")
+        user.create(username="blue2", password="blue2", role="blue2")
+    except:
+        print("Table user already exists")
+    try:
+        entry.create_table()
+    except:
+        print("Table entry already exists")
+
 
 if __name__ == '__main__':
     create_tables()

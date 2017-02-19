@@ -25,11 +25,48 @@ def lock():
                 abort(403)
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
+    if "red" in session['role'] or "blue" in session['role']:
+        return redirect(url_for('scout', match_num=1))
+    elif "admin" in session['role']:
+        return redirect(url_for('admin'))
+
+
+@app.route('/scout/<int:match_num>', methods=['GET', 'POST'])
+def scout(match_num):
     if request.method == 'POST':
-        pass
-    return render_template('index.html', team="211Z")
+        if process_request(match_num):
+            return redirect(url_for('scout', match_num=match_num + 1))
+        else:
+            return render_template('index.html', team="211Z", match=match_num)
+    return render_template('index.html', team="211Z", match=match_num)
+
+
+def process_request(match_num):
+    team_name = request.form['team_name']
+
+    auto = int(request.form['auto']) * 10
+    speed = request.form['speed']
+    capacity = request.form['capacity']
+    driver = request.form['driver']
+
+    hang = "hang" in request.form
+    cube = "cube" in request.form
+    blocking = "blocking" in request.form
+    try:
+        database.entry.create(team_name=team_name,
+                              match_num=match_num,
+                              auto=auto,
+                              speed=speed,
+                              capacity=capacity,
+                              driver=driver,
+                              hang=hang,
+                              cube=cube,
+                              blocking=blocking)
+        return True
+    except:
+        return False
 
 
 @app.route("/login", methods=['GET', 'POST'])
