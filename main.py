@@ -39,7 +39,22 @@ def scout(match_num):
     if request.method == 'POST':
         if process_request(match_num):
             return redirect(url_for('scout', match_num=match_num + 1))
-    return render_template('index.html', team="211Z", match=match_num)
+    return render_template('index.html',
+                           team=get_team_num(match_num, session['role']),
+                           match=match_num)
+
+
+def get_team_num(match_num, color):
+    if color == "red1":
+        return database.match.get(database.match.match_id == match_num).red1
+    elif color == "red2":
+        return database.match.get(database.match.match_id == match_num).red2
+    elif color == "blue1":
+        return database.match.get(database.match.match_id == match_num).blue1
+    elif color == "blue2":
+        return database.match.get(database.match.match_id == match_num).blue2
+    else:
+        return ""
 
 
 def process_request(match_num):
