@@ -2,6 +2,7 @@
 
 import database
 import os
+import operator
 from flask import Flask, render_template, session, request, redirect, url_for
 from flask import abort
 import vex_via_wrapper
@@ -163,7 +164,42 @@ def manage_teams():
 
 @app.route("/team_picklist/<team_name>")
 def team_picklist(team_name):
-    return team_name
+    team = database.team.get(database.team.team_name == team_name)
+    picklist = generate_picklist(team)
+    return render_template("picklist.html",
+                           team_name=team_name, picklist=picklist)
+
+
+def get_list_of_teams():
+    teams = set()
+    for team in database.entry.select():
+        teams.add(team.team_name)
+    return teams
+
+
+def generate_picklist(team_preference):
+    picklist = []
+    for team in get_list_of_teams():
+        match_scores = []
+        for match in database.entry.select().where(database.entry.team_name == team):
+            auto = match.auto * team_preference.auto / 100
+            speed = match.speed * team_preference.speed / 100
+            capacity = match.capacity * team_preference.capacity / 100
+            driver = match.driver * team_preference.driver / 100
+
+            hang = match.hang * team_preference.hang / 100
+            cube = match.cube * team_preference.cube / 100
+            blocking = match.blocking * team_preference.blocking / 100
+
+            total = auto + speed + capacity + driver + hang + cube + blocking
+            match_scores.append(total)
+        match_scores.sort()
+        if (len(match_scores) > 3):
+            match_scores = match_scores[1:-1]
+        picklist.append({"team_name": team, "score": sum(
+            match_scores) / max(len(match_scores), 1)})
+    picklist.sort(key=operator.itemgetter('score'), reverse=True)
+    return picklist
 
 
 @app.route("/login", methods=['GET', 'POST'])
