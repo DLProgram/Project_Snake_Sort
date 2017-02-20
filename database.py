@@ -72,6 +72,20 @@ class entry(peewee.Model):
 
 
 class team(peewee.Model):
+    """Table storing all teams.
+
+    Args:
+        team_name(Char): Team name
+
+        auto(Int): Auto percentage
+        speed(Int): Speed percentage
+        capacity(Int): Capacity percentage
+        driver(Int): Driver's skill percentage
+
+        hang(Bool): High hang percentage
+        cube(Bool): Cube percentage
+        blocking(Bool): Blocking percentage
+    """
     team_name = peewee.CharField()
 
     auto = peewee.FloatField()
@@ -88,6 +102,8 @@ class team(peewee.Model):
 
 
 def create_tables():
+    """Try to create all the tables, print error message if table exists
+    """
     try:
         match.create_table()
     except:
@@ -106,6 +122,10 @@ def create_tables():
     except:
         print("Table entry already exists")
 
-    team.create_table()
+    try:
+        team.create_table()
+    except:
+        print("Table team already exists")
+
 if __name__ == '__main__':
     create_tables()

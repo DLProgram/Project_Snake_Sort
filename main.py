@@ -18,6 +18,11 @@ admin_lock_pages = ["/get_events", "/get_divisions",
 
 @app.before_request
 def lock():
+    """Uses before request hook to check for user premission.
+    Pages in the list no_lock_pages are ignored.
+    Pages in the list admin_lock_pages need admin privileges.
+
+    """
     for page in no_lock_pages:
         if page in request.path:
             return
@@ -31,6 +36,13 @@ def lock():
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    """Index Page, redirects user based on privileges.
+
+    Returns:
+        Send scouts to scout match number 1.
+        Send admin to manage_teams page.
+
+    """
     if "red" in session['role'] or "blue" in session['role']:
         return redirect(url_for('scout', match_num=1))
     elif "admin" in session['role']:
@@ -39,6 +51,16 @@ def index():
 
 @app.route('/scout/<int:match_num>', methods=['GET', 'POST'])
 def scout(match_num):
+    """Scouting page
+
+    Args:
+        match_num(int): Match number of the current game.
+
+    Returns:
+        If data is being submited(Post), redirect to next match.
+        If the request method is get, then return the html page.
+
+    """
     if request.method == 'POST':
         if process_request(match_num):
             return redirect(url_for('scout', match_num=match_num + 1))
@@ -48,6 +70,16 @@ def scout(match_num):
 
 
 def get_team_num(match_num, color):
+    """Gets a team number based on match num and role color.
+
+    Args:
+        match_num(int): Match Number
+        color(str): Color of the team
+
+    Returns:
+        A team number from the database.
+
+    """
     if color == "red1":
         return database.match.get(database.match.match_id == match_num).red1
     elif color == "red2":
@@ -61,6 +93,14 @@ def get_team_num(match_num, color):
 
 
 def process_request(match_num):
+    """Processes the request and save to database.
+    Args:
+        match_num(int): match number, because the request does not include it.
+
+    Returns:
+        Boolean of the status, True if succeed, False is failed.
+
+    """
     team_name = request.form['team_name']
 
     auto = int(request.form['auto']) * 10
@@ -88,6 +128,12 @@ def process_request(match_num):
 
 @app.route("/get_events")
 def get_events():
+    """List all the events from vex via data.
+
+    Returns:
+        html with event data.
+
+    """
     data = []
     for e in vex_via_wrapper.get_events():
         data.append({'id': e[0], 'name': e[1], 'location': e[2]})
@@ -96,6 +142,15 @@ def get_events():
 
 @app.route("/get_divisions/<event_id>")
 def get_divisions(event_id):
+    """Get a list of division based on event id
+
+    Args:
+        event_id(str): Id of the event.
+
+    Returns:
+        html with division data.
+
+    """
     data = []
     for e in vex_via_wrapper.get_divisions(event_id):
         data.append({'id': e[0], 'name': e[1], 'event_id': event_id})
@@ -104,6 +159,16 @@ def get_divisions(event_id):
 
 @app.route("/get_matches/<event_id>/<division_id>")
 def get_matches(event_id, division_id):
+    """Get a list of matches based on event id and division_id
+
+    Args:
+        event_id(str): Id of the event.
+        division_id(str): Id of the division.
+
+    Returns:
+        html with match data.
+
+    """
     data = []
     for m in vex_via_wrapper.get_matches(event_id, division_id):
         if m[0] == '2':
@@ -115,6 +180,16 @@ def get_matches(event_id, division_id):
 
 @app.route("/save_match_data/<event_id>/<division_id>")
 def save_match_data(event_id, division_id):
+    """Saves match data based on an event_id and division_id.
+
+    Args:
+        event_id(str): Id of the event.
+        division_id(str): Id of the division.
+
+    Returns:
+        A dialog with a success message.
+
+    """
     for m in vex_via_wrapper.get_matches(event_id, division_id):
         if m[0] == '2':
             database.match.create(match_id=m[2],
@@ -129,6 +204,12 @@ def save_match_data(event_id, division_id):
 
 @app.route("/manage_teams", methods=['GET', 'POST'])
 def manage_teams():
+    """Show a list of teams, and a form to add more teams.
+
+    Returns:
+        html page with the team info.
+
+    """
     if request.method == 'POST':
         team_name = request.form["team_name"]
 
@@ -164,6 +245,15 @@ def manage_teams():
 
 @app.route("/team_picklist/<team_name>")
 def team_picklist(team_name):
+    """Shows a picklist based on team preference.
+
+    Args:
+        team_name(str): Name of the team.
+
+    Returns:
+        html with the picklist.
+
+    """
     team = database.team.get(database.team.team_name == team_name)
     picklist = generate_picklist(team)
     return render_template("picklist.html",
@@ -171,6 +261,12 @@ def team_picklist(team_name):
 
 
 def get_list_of_teams():
+    """Get a list of teams from entry database.
+
+    Returns:
+        List of teams.
+
+    """
     teams = set()
     for team in database.entry.select():
         teams.add(team.team_name)
@@ -178,6 +274,14 @@ def get_list_of_teams():
 
 
 def generate_picklist(team_preference):
+    """Generate a picklist based on team preference and match score.
+
+    Args:
+        team_preference(team): Team class with preference data.
+
+    Returns:
+        A sorted list of the highest socre.
+    """
     picklist = []
     for team in get_list_of_teams():
         match_scores = []
@@ -204,6 +308,12 @@ def generate_picklist(team_preference):
 
 @app.route("/list_entry", methods=['GET', 'POST'])
 def list_entry():
+    """List all the entries form entry database.
+
+    Returns:
+        html with entry data.
+
+    """
     entries = []
     for entry in database.entry.select():
         entries.append({"id": entry.id,
@@ -221,6 +331,13 @@ def list_entry():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
+    """Authenticates a user and create a session.
+
+    Returns:
+        html of login page if not logged in or login failed.
+        redirects to index if login successfully.
+
+    """
     if request.method == 'POST':
         users = database.user.select().where(
             database.user.username == request.form['username'],
@@ -236,6 +353,11 @@ def login():
 
 @app.route("/logout")
 def logout():
+    """Loges user out, and removes the user session.
+
+    Returns:
+        redirects to login page.
+    """
     session.pop('username', None)
     return redirect(url_for('login'))
 
