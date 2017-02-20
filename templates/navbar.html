@@ -11,13 +11,14 @@
     {% else %}
     <a href="#" class="brand-logo center">Snake Sort</a>
     {% endif %}
+    <ul id="nav-mobile" class="left">
+      <li><a href="{{ url_for('list_entry') }}">List Entries</a></li>
     {% if session.role == 'admin'%}
-    <ul id="nav-mobile" class="left hide-on-med-and-down">
       <li><a href="{{ url_for('get_events') }}">Get Events</a></li>
       <li><a href="{{ url_for('manage_teams') }}">Manage Teams</a></li>
-    </ul>
     {% endif %}
-    <ul id="nav-mobile" class="right hide-on-med-and-down">
+    </ul>
+    <ul id="nav-mobile" class="right">
       <li><a href="{{ url_for('logout') }}">{{ session.username }}</a></li>
     </ul>
   </div>

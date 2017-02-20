@@ -202,6 +202,23 @@ def generate_picklist(team_preference):
     return picklist
 
 
+@app.route("/list_entry", methods=['GET', 'POST'])
+def list_entry():
+    entries = []
+    for entry in database.entry.select():
+        entries.append({"id": entry.id,
+                        "team_name": entry.team_name,
+                        "match_num": entry.match_num,
+                        "auto": entry.auto,
+                        "speed": entry.speed,
+                        "capacity": entry.capacity,
+                        "driver": entry.driver,
+                        "hang": entry.hang,
+                        "cube": entry.cube,
+                        "blocking": entry.blocking})
+    return render_template("list_entry.html", entries=entries)
+
+
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
